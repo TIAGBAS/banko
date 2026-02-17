@@ -7,6 +7,7 @@ echo "<h1>Database Connection Test</h1>";
 
 // 1. Check Environment Variables
 echo "<h2>1. Environment Variables</h2>";
+$dbUrl = getenv('DATABASE_URL');
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT');
 $user = getenv('MYSQLUSER');
@@ -14,12 +15,24 @@ $pass = getenv('MYSQLPASSWORD');
 $dbname = getenv('MYSQLDATABASE');
 
 echo "<ul>";
-echo "<li><strong>MYSQLHOST:</strong> " . ($host ? htmlspecialchars($host) : "<span style='color:red'>Not Set</span>") . "</li>";
-echo "<li><strong>MYSQLPORT:</strong> " . ($port ? htmlspecialchars($port) : "<span style='color:red'>Not Set (Default 3306)</span>") . "</li>";
-echo "<li><strong>MYSQLUSER:</strong> " . ($user ? htmlspecialchars($user) : "<span style='color:red'>Not Set</span>") . "</li>";
-echo "<li><strong>MYSQLPASSWORD:</strong> " . ($pass ? "Provide (Hidden)" : "<span style='color:red'>Not Set</span>") . "</li>";
-echo "<li><strong>MYSQLDATABASE:</strong> " . ($dbname ? htmlspecialchars($dbname) : "<span style='color:red'>Not Set</span>") . "</li>";
+echo "<li><strong>DATABASE_URL:</strong> " . ($dbUrl ? "Set (Hidden)" : "<span style='color:red'>Not Set</span>") . "</li>";
+echo "<li><strong>MYSQLHOST:</strong> " . ($host ? htmlspecialchars($host) : "Not Set") . "</li>";
+echo "<li><strong>MYSQLPORT:</strong> " . ($port ? htmlspecialchars($port) : "Not Set") . "</li>";
+echo "<li><strong>MYSQLUSER:</strong> " . ($user ? htmlspecialchars($user) : "Not Set") . "</li>";
+echo "<li><strong>MYSQLPASSWORD:</strong> " . ($pass ? "Set (Hidden)" : "Not Set") . "</li>";
+echo "<li><strong>MYSQLDATABASE:</strong> " . ($dbname ? htmlspecialchars($dbname) : "Not Set") . "</li>";
 echo "</ul>";
+
+// Parse URL if available (same logic as db.php used to test)
+if ($dbUrl && !$host) {
+    $dbOpts = parse_url($dbUrl);
+    $host = $dbOpts['host'];
+    $port = $dbOpts['port'];
+    $user = $dbOpts['user'];
+    $pass = $dbOpts['pass'];
+    $dbname = ltrim($dbOpts['path'], '/');
+    echo "<p><em>Parsed credentials from DATABASE_URL.</em></p>";
+}
 
 // 2. Test Connection
 echo "<h2>2. Connection Attempt</h2>";
