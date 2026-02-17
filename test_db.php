@@ -38,22 +38,28 @@ foreach ($keys as $key) {
 }
 echo "</div>";
 
-// Parse URL if available (same logic as db.php used to test)
+// Parse URL if available (prioritize this if vars are missing)
 $urlToParse = $dbUrl ?: $mysqlUrl;
-if ($urlToParse && !$host) {
+if ($urlToParse) {
     $dbOpts = parse_url($urlToParse);
-    $host = $dbOpts['host'];
-    $port = $dbOpts['port'];
-    $user = $dbOpts['user'];
-    $pass = $dbOpts['pass'];
-    $dbname = ltrim($dbOpts['path'], '/');
+    // Only override if we successfully parsed
+    if (isset($dbOpts['host']))
+        $host = $dbOpts['host'];
+    if (isset($dbOpts['port']))
+        $port = $dbOpts['port'];
+    if (isset($dbOpts['user']))
+        $user = $dbOpts['user'];
+    if (isset($dbOpts['pass']))
+        $pass = $dbOpts['pass'];
+    if (isset($dbOpts['path']))
+        $dbname = ltrim($dbOpts['path'], '/');
     echo "<p><em>Parsed credentials from URL variable.</em></p>";
 }
 
 // 2. Test Connection
 echo "<h2>2. Connection Attempt</h2>";
-if (!$host || !$user || !$dbname) {
-    echo "<p style='color:red'>Cannot attempt connection: Missing required environment variables.</p>";
+if (!$host) {
+    echo "<p style='color:red'>Cannot attempt connection: Host not found.</p>";
     exit;
 }
 
@@ -74,9 +80,23 @@ try {
     $count = $stmt->fetchColumn();
     echo "<p style='color:green'><strong>Success:</strong> Table 'logs' exists and contains $count records.</p>";
 } catch (PDOException $e) {
-    echo "<p style='color:red'><strong>Error:</strong> Could not query 'logs' table. It might not exist.</p>";
-    echo "<p>PDO Error: " . htmlspecialchars($e->getMessage()) . "</p>";
-    echo "<hr><h3>Suggested Action:</h3>";
-    echo "<p>Run the SQL from <code>schema.sql</code> to create the table.</p>";
+    echo "<p style='color:orange'><strong>Notice:</strong> Table 'logs' not found (or error query).</p>";
+    echo "<p>Attempting to create table...</p>";
+
+    // Auto-create table
+    try {
+        $sql = "CREATE TABLE IF NOT EXISTS logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            ip_address VARCHAR(45) NOT NULL,
+            user_agent TEXT,
+            details JSON,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )";
+        $pdo->exec($sql);
+        echo "<p style='color:green'><strong>Success:</strong> Table 'logs' created successfully!</p>";
+    } catch (PDOException $ex) {
+        echo "<p style='color:red'><strong>Error:</strong> Failed to create table. " . htmlspecialchars($ex->getMessage()) . "</p>";
+    }
 }
 ?>
