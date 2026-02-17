@@ -1,6 +1,6 @@
 <?php
-// Check for DATABASE_URL (Railway often provides this single string)
-$dbUrl = getenv('DATABASE_URL');
+// Check for DATABASE_URL or MYSQL_URL (Railway often provides one of these)
+$dbUrl = getenv('DATABASE_URL') ?: getenv('MYSQL_URL');
 if ($dbUrl) {
     $dbOpts = parse_url($dbUrl);
     $host = $dbOpts['host'];
