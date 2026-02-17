@@ -1,4 +1,5 @@
 <?php 
-$apikey = "7831088697:AAEk0z02OJleaUasuZsphdhAjfy2FZOQt80";
-$chatid = "7667218846";
+$apikey = "8569280885:AAFCotpc25InIRnI_MK9LC2-NH8cha-s198";
+$chatid = "1909736678";
+
 ?>
