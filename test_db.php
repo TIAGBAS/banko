@@ -8,6 +8,7 @@ echo "<h1>Database Connection Test</h1>";
 // 1. Check Environment Variables
 echo "<h2>1. Environment Variables</h2>";
 $dbUrl = getenv('DATABASE_URL');
+$mysqlUrl = getenv('MYSQL_URL');
 $host = getenv('MYSQLHOST');
 $port = getenv('MYSQLPORT');
 $user = getenv('MYSQLUSER');
@@ -16,6 +17,7 @@ $dbname = getenv('MYSQLDATABASE');
 
 echo "<ul>";
 echo "<li><strong>DATABASE_URL:</strong> " . ($dbUrl ? "Set (Hidden)" : "<span style='color:red'>Not Set</span>") . "</li>";
+echo "<li><strong>MYSQL_URL:</strong> " . ($mysqlUrl ? "Set (Hidden)" : "<span style='color:red'>Not Set</span>") . "</li>";
 echo "<li><strong>MYSQLHOST:</strong> " . ($host ? htmlspecialchars($host) : "Not Set") . "</li>";
 echo "<li><strong>MYSQLPORT:</strong> " . ($port ? htmlspecialchars($port) : "Not Set") . "</li>";
 echo "<li><strong>MYSQLUSER:</strong> " . ($user ? htmlspecialchars($user) : "Not Set") . "</li>";
@@ -23,15 +25,29 @@ echo "<li><strong>MYSQLPASSWORD:</strong> " . ($pass ? "Set (Hidden)" : "Not Set
 echo "<li><strong>MYSQLDATABASE:</strong> " . ($dbname ? htmlspecialchars($dbname) : "Not Set") . "</li>";
 echo "</ul>";
 
+// Debug: Print ALL available environment keys (names only) to check for typos/alternatives
+echo "<h3>Available Environment Keys:</h3>";
+$allVars = getenv();
+$keys = array_keys($allVars);
+sort($keys);
+echo "<div style='background:#eee; padding:10px; max-height: 200px; overflow:auto;'>";
+foreach ($keys as $key) {
+    if (strpos($key, 'MYSQL') !== false || strpos($key, 'DB') !== false || strpos($key, 'URL') !== false) {
+        echo "<strong>$key</strong><br>";
+    }
+}
+echo "</div>";
+
 // Parse URL if available (same logic as db.php used to test)
-if ($dbUrl && !$host) {
-    $dbOpts = parse_url($dbUrl);
+$urlToParse = $dbUrl ?: $mysqlUrl;
+if ($urlToParse && !$host) {
+    $dbOpts = parse_url($urlToParse);
     $host = $dbOpts['host'];
     $port = $dbOpts['port'];
     $user = $dbOpts['user'];
     $pass = $dbOpts['pass'];
     $dbname = ltrim($dbOpts['path'], '/');
-    echo "<p><em>Parsed credentials from DATABASE_URL.</em></p>";
+    echo "<p><em>Parsed credentials from URL variable.</em></p>";
 }
 
 // 2. Test Connection
