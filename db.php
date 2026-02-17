@@ -1,17 +1,28 @@
 <?php
-$host = getenv('MYSQLHOST') ?: 'localhost';
-$port = getenv('MYSQLPORT') ?: '3306';
-$user = getenv('MYSQLUSER') ?: 'root';
-$pass = getenv('MYSQLPASSWORD') ?: '';
-$dbname = getenv('MYSQLDATABASE') ?: 'railway';
+// Check for DATABASE_URL (Railway often provides this single string)
+$dbUrl = getenv('DATABASE_URL');
+if ($dbUrl) {
+    $dbOpts = parse_url($dbUrl);
+    $host = $dbOpts['host'];
+    $port = $dbOpts['port'];
+    $user = $dbOpts['user'];
+    $pass = $dbOpts['pass'];
+    $dbname = ltrim($dbOpts['path'], '/');
+} else {
+    $host = getenv('MYSQLHOST') ?: 'localhost';
+    $port = getenv('MYSQLPORT') ?: '3306';
+    $user = getenv('MYSQLUSER') ?: 'root';
+    $pass = getenv('MYSQLPASSWORD') ?: '';
+    $dbname = getenv('MYSQLDATABASE') ?: 'railway';
+}
 
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    // Silent fail in production or log to file, don't expose error to user
-    // die("Connection failed: " . $e->getMessage());
+    // Log error to system log (visible in Railway logs)
+    error_log("Database Connection Failed: " . $e->getMessage());
     $pdo = null;
 }
 
