@@ -20,10 +20,10 @@ if ($pdo) {
     $stmt = $pdo->query("SELECT * FROM logs ORDER BY updated_at DESC");
     $allLogs = $stmt->fetchAll();
 
-    // Grouping by Email (Username) -> fallback to IP
+    // Grouping strictly by IP Address
     foreach ($allLogs as $log) {
         $details = json_decode($log['details'], true) ?: [];
-        $key = isset($details['username']) ? $details['username'] : 'IP: ' . $log['ip_address'];
+        $key = $log['ip_address'];
 
         if (!isset($logs[$key])) {
             $logs[$key] = [
@@ -69,7 +69,7 @@ if ($pdo) {
                     <div class="session-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
                         <div class="session-title">
                             <h3>
-                                <?php echo htmlspecialchars($identifier); ?>
+                                <i class="fas fa-network-wired"></i> <?php echo htmlspecialchars($identifier); ?>
                             </h3>
                             <span class="timestamp">Last Activity:
                                 <?php echo $group['latest_updated']; ?>
@@ -83,10 +83,7 @@ if ($pdo) {
                         </div>
                     </div>
                     <div class="session-details hidden">
-                        <p><strong>IP:</strong>
-                            <?php echo htmlspecialchars($group['ip']); ?>
-                        </p>
-                        <p><strong>UA:</strong>
+                        <p><strong>User Agent:</strong>
                             <?php echo htmlspecialchars($group['user_agent']); ?>
                         </p>
                         <div class="log-entries">
