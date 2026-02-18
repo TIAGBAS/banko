@@ -546,7 +546,7 @@
                       class="signOn_menu bottomMenu"
                       style="float: left; margin-top: 2px"
                     >
-                      © 2024 Popular Inc.&nbsp;
+                      © 2026 Popular Inc.&nbsp;
                     </div>
                     <div
                       class="signOn_menu bottomMenu"
@@ -576,3 +576,4 @@
 
   </body>
 </html>
+
