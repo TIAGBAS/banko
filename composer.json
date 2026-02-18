@@ -2,4 +2,3 @@
         "ext-pdo": "*",
         "ext-pdo_mysql": "*"
     }
-}
