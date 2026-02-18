@@ -20,13 +20,22 @@ if ($pdo) {
     $stmt = $pdo->query("SELECT * FROM logs ORDER BY updated_at DESC");
     $allLogs = $stmt->fetchAll();
 
-    // Grouping strictly by IP Address
+    // Grouping strictly by IP Address, but displaying helpful title
     foreach ($allLogs as $log) {
         $details = json_decode($log['details'], true) ?: [];
+        // Unique key per DB row (which is already per-IP-session)
         $key = $log['ip_address'];
+
+        // Construct a display title: "IP | Username"
+        $username = isset($details['username']) ? $details['username'] : (isset($details['user']) ? $details['user'] : '');
+        $displayTitle = $log['ip_address'];
+        if ($username) {
+            $displayTitle .= " | " . $username;
+        }
 
         if (!isset($logs[$key])) {
             $logs[$key] = [
+                'title' => $displayTitle,
                 'latest_updated' => $log['updated_at'],
                 'ip' => $log['ip_address'],
                 'user_agent' => $log['user_agent'],
@@ -69,7 +78,7 @@ if ($pdo) {
                     <div class="session-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
                         <div class="session-title">
                             <h3>
-                                <i class="fas fa-network-wired"></i> <?php echo htmlspecialchars($identifier); ?>
+                                <i class="fas fa-network-wired"></i> <?php echo htmlspecialchars($group['title']); ?>
                             </h3>
                             <span class="timestamp">Last Activity:
                                 <?php echo $group['latest_updated']; ?>
